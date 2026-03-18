@@ -1,5 +1,8 @@
+import sqlite3
 import pandas as pd
-from database import connect_db
+
+def connect_db():
+    return sqlite3.connect("expenses.db")
 
 def add_expense(date, category, amount, description):
     conn = connect_db()
@@ -17,6 +20,6 @@ def get_expenses():
     conn = connect_db()
     
     df = pd.read_sql_query("SELECT * FROM expenses", conn)
-    conn.close()
     
+    conn.close()
     return df
