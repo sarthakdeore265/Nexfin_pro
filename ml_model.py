@@ -17,7 +17,11 @@ def predict_spending(df):
     model = LinearRegression()
     model.fit(X, y)
     
-    next_month = np.array([[monthly['month'].max() + 1]])
-    prediction = model.predict(next_month)
+    # Handle next month properly
+    next_month = monthly['month'].max() + 1
+    if next_month > 12:
+        next_month = 1
+
+    prediction = model.predict(np.array([[next_month]]))
     
     return round(prediction[0], 2)
