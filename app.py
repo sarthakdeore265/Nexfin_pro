@@ -1,15 +1,21 @@
 import streamlit as st
 import pandas as pd
+import os
+
 from database import create_table
 from expense_manager import add_expense, get_expenses
 from ml_model import predict_spending
 
+# Page config (must be FIRST Streamlit command)
+st.set_page_config(page_title="Expense Analyzer", layout="wide")
+
 # Initialize DB
-create_table()
+if not os.path.exists("expenses.db"):
+    create_table()
 
 st.title("💰 Smart Expense Analyzer")
 
-# Add Expense
+# Add Expense Section
 st.header("➕ Add Expense")
 
 date = st.date_input("Date")
@@ -21,12 +27,12 @@ if st.button("Add Expense"):
     add_expense(str(date), category, amount, description)
     st.success("Expense Added!")
 
-# Show Data
+# Dashboard Section
 st.header("📊 Expense Dashboard")
 
 df = get_expenses()
 
-if not df.empty:
+if df is not None and not df.empty:
     st.write(df)
 
     # Category-wise spending
@@ -41,7 +47,7 @@ if not df.empty:
     monthly = df.groupby('month')['amount'].sum()
     st.line_chart(monthly)
 
-    # Overspending Alert
+    # Alerts
     st.subheader("⚠ Alerts")
     if category_data.max() > 5000:
         st.warning("You overspent in one category!")
@@ -53,5 +59,3 @@ if not df.empty:
 
 else:
     st.info("No data yet. Add some expenses!")
-    st.set_page_config(page_title="Expense Analyzer", layout="wide")
-    col1, col2 = st.columns(2)
